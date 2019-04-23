@@ -4,7 +4,7 @@
 #include <boost/test/output_test_stream.hpp>
 
 #include "fact.cpp"
-#include "map_allocator.cpp"
+#include "reserve_allocator.cpp"
 
 BOOST_AUTO_TEST_SUITE(allocator_test_suite)
 
