@@ -29,6 +29,8 @@ target_link_libraries(unit_tests
 
 install(TARGETS allocator RUNTIME DESTINATION bin)
 
+set(CPACK_GENERATOR DEB)
+
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
@@ -41,4 +43,4 @@ include(CPack)
 
 enable_testing()
 
-add_test(NAME ip_filter_test COMMAND unit_tests)
+add_test(NAME allocator_test COMMAND unit_tests)
