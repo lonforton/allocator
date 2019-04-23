@@ -20,7 +20,7 @@ T *allocate(std::size_t n)
 {
   T *mem = reinterpret_cast<T *>(reserve_pointer);
   if (!mem)
-    throw std::bad_cast();
+    throw std::bad_alloc();
     
   mem = mem + element_counter;
   element_counter += n;
