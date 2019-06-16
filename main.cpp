@@ -30,13 +30,14 @@ int main()
   simple_list::slist<int> simple_list_default_alloc;
   for (int i = 0; i < map_reserve_size; ++i)
   {
-    simple_list_default_alloc.insert(i);
+    simple_list_default_alloc.insert(std::move(i));
   }
 
   auto simple_list_custom_alloc = simple_list::slist<int, reserve_allocator<int, map_reserve_size>>{};
+  //simple_list::slist<int, reserve_allocator<int, map_reserve_size>> simple_list_custom_alloc;
   for (int i = 0; i < map_reserve_size; ++i)
   {
-    simple_list_custom_alloc.insert(i);
+    simple_list_custom_alloc.insert(std::move(i));
   }
 
   for (auto it = simple_list_custom_alloc.begin(); it != simple_list_custom_alloc.end(); it++)
