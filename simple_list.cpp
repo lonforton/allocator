@@ -7,11 +7,25 @@ template <class T, class Allocator = std::allocator<T>>
 class slist
 {
 public:
-  typedef Allocator allocator_type;
-  typedef typename Allocator::value_type value_type;
-  typedef typename Allocator::reference reference;
-  typedef typename Allocator::const_reference const_reference;
-  
+  using allocator_type = Allocator;
+  using value_type = typename Allocator::value_type;
+  using reference = typename Allocator::reference;
+  using const_reference = typename Allocator::const_reference;
+
+  slist() = default; 
+  slist(const slist& other_list){
+    Node *walk_node = _head;
+    while(walk_node != nullptr) {
+      this->insert(walk_node->data);
+      walk_node = walk_node->next;
+    }
+  }
+
+  slist(slist&& other_list){
+    this->_head = other_list._head;
+    other_list._head = nullptr;
+  }
+
   struct Node
   {
     T data;
@@ -25,35 +39,33 @@ public:
   };
 
   typedef typename Allocator::template 
-  rebind<Node>::other rebinded_allocator_type;
+  rebind<Node>::other rebinded_allocator_type;  
 
   rebinded_allocator_type _rebinded_allocator;
 
   ~slist(){
-     Node *walk_node = _head;
-     while(walk_node->next != nullptr){
-       Node * temp_node = walk_node;    
-       walk_node = walk_node->next;    
-       _rebinded_allocator.destroy(temp_node);
-       _rebinded_allocator.deallocate(temp_node, 1);          
-     }
-     _rebinded_allocator.destroy(walk_node);
-     _rebinded_allocator.deallocate(walk_node, 1);
+    Node *walk_node = _head;
+    while(walk_node != nullptr) {
+      Node * temp_node = walk_node;       
+      walk_node = walk_node->next;
+      _rebinded_allocator.destroy(temp_node);
+      _rebinded_allocator.deallocate(temp_node, 1);
+    }
   }
 
   Node *_head = nullptr;
 
-  Node* create_node(T value){       
+  Node* create_node(T&& value){       
     Node *node = _rebinded_allocator.allocate(1);
-    _rebinded_allocator.construct(node, value);
+    _rebinded_allocator.construct(node, std::forward<T>(value));
     return node;
   }
 
-  void insert(const T &value)
+  void insert(T&& value)
   {    
     if (_head == nullptr)
     {
-      _head = create_node(value);
+      _head = create_node(std::forward<T>(value));
     }
     else
     {
@@ -62,7 +74,7 @@ public:
       {
         node = node->next;
       }
-      Node *new_node = create_node(value);
+      Node *new_node = create_node(std::forward<T>(value));
       node->next = new_node;
     }
   }
@@ -70,11 +82,11 @@ public:
   class iterator
   {
   public:
-    typedef iterator self_type;
-    typedef T value_type;
-    typedef T &reference;
-    typedef T *pointer;
-    typedef std::forward_iterator_tag iterator_category;
+    using self_type = iterator;
+    using value_type = T;
+    using reference = T&;
+    using pointer = T*;
+    using iterator_category = std::forward_iterator_tag;
 
     iterator();
     iterator(Node *node) : _node(node){};
