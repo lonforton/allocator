@@ -34,7 +34,6 @@ int main()
   }
 
   auto simple_list_custom_alloc = simple_list::slist<int, reserve_allocator<int, map_reserve_size>>{};
-  //simple_list::slist<int, reserve_allocator<int, map_reserve_size>> simple_list_custom_alloc;
   for (int i = 0; i < map_reserve_size; ++i)
   {
     simple_list_custom_alloc.insert(std::move(i));
@@ -44,6 +43,9 @@ int main()
   {
     std::cout << *it << std::endl;
   }
+
+  auto simple_list_custom_alloc_hard = simple_list::slist<hard, reserve_allocator<hard, map_reserve_size>>{};
+  simple_list_custom_alloc_hard.insert("one", 1);
 
   return 0;
 }

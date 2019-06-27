@@ -1,5 +1,11 @@
 #include <iostream>
 
+struct hard {
+    hard(const char *, size_t) {};
+    hard(const hard &) = delete;
+    hard(hard && other) = default;
+};
+
 namespace simple_list
 {
 
@@ -31,9 +37,8 @@ public:
     T data;
     Node *next;
 
-    Node(T value)
-    {
-      data = value;
+    Node(T&& value) : data(std::move(value))
+    {      
       next = nullptr;
     }
   };
@@ -65,7 +70,7 @@ public:
   {    
     if (_head == nullptr)
     {
-      _head = create_node(std::forward<T>(value));
+      _head = create_node(std::move(T(value)));
     }
     else
     {
@@ -74,7 +79,26 @@ public:
       {
         node = node->next;
       }
-      Node *new_node = create_node(std::forward<T>(value));
+      Node *new_node = create_node(std::move(T(value)));
+      node->next = new_node;
+    }
+  }
+
+    template <typename U, typename V>
+    void insert(U&& value_1, V&& value_2)
+  {    
+    if (_head == nullptr)
+    {
+      _head = create_node(std::move(T(value_1, value_2)));
+    }
+    else
+    {
+      Node *node = _head;
+      while (node->next != nullptr)
+      {
+        node = node->next;
+      }
+      Node *new_node = create_node(std::move(T(value_1, value_2)));
       node->next = new_node;
     }
   }
