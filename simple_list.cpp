@@ -3,7 +3,6 @@
 struct hard {
     hard(const char *, size_t) {};
     hard(const hard &) = delete;
-    hard(hard && other) = default;
 };
 
 namespace simple_list
@@ -20,25 +19,27 @@ public:
 
   slist() = default; 
   slist(const slist& other_list){
-    Node *walk_node = _head;
+    Node *walk_node = other_list._head;
     while(walk_node != nullptr) {
       this->insert(walk_node->data);
       walk_node = walk_node->next;
     }
   }
 
-  slist(slist&& other_list){
-    this->_head = other_list._head;
-    other_list._head = nullptr;
-  }
+   slist(slist&& other_list){
+     this->_head = other_list._head;     
+     other_list._head = nullptr;
+     this->_rebinded_allocator = other_list._rebinded_allocator;     
+   }
 
   struct Node
   {
     T data;
     Node *next;
 
-    Node(T&& value) : data(std::move(value))
-    {      
+    template<typename...Args>
+    Node(Args&& ...args) : data(args...)
+    {            
       next = nullptr;
     }
   };
@@ -60,17 +61,19 @@ public:
 
   Node *_head = nullptr;
 
-  Node* create_node(T&& value){       
+  template<typename...Args>
+  Node* create_node(Args&& ...args){       
     Node *node = _rebinded_allocator.allocate(1);
-    _rebinded_allocator.construct(node, std::forward<T>(value));
+    _rebinded_allocator.construct(node, std::forward<Args>(args)...);
     return node;
   }
 
-  void insert(T&& value)
-  {    
+  template<typename...Args>
+  void insert(Args&& ...args)  
+  {
     if (_head == nullptr)
     {
-      _head = create_node(std::move(T(value)));
+      _head = create_node(std::forward<Args>(args)...);
     }
     else
     {
@@ -79,26 +82,7 @@ public:
       {
         node = node->next;
       }
-      Node *new_node = create_node(std::move(T(value)));
-      node->next = new_node;
-    }
-  }
-
-    template <typename U, typename V>
-    void insert(U&& value_1, V&& value_2)
-  {    
-    if (_head == nullptr)
-    {
-      _head = create_node(std::move(T(value_1, value_2)));
-    }
-    else
-    {
-      Node *node = _head;
-      while (node->next != nullptr)
-      {
-        node = node->next;
-      }
-      Node *new_node = create_node(std::move(T(value_1, value_2)));
+      Node *new_node = create_node(std::forward<Args>(args)...);
       node->next = new_node;
     }
   }
